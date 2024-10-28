@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Hangfire;
@@ -83,6 +85,30 @@ namespace RealTimeChatHub.Controllers
                         ScheduleMessageDelivery(messageId, receiverId);
                     }
                 }
+            }
+        }
+
+        [HttpGet]
+        [Route("history")]
+        public IHttpActionResult GetMessageHistory(int senderId, int receiverId)
+        {
+            using (var dbContext = new ChatAppDBContext())
+            {
+                var messages = dbContext.Messages
+                    .Where(m => (m.SenderId == senderId && m.ReceiverId == receiverId) ||
+                                (m.SenderId == receiverId && m.ReceiverId == senderId))
+                    .Select(m => new
+                    {
+                        m.SenderId,
+                        m.ReceiverId,
+                        m.MessageText,
+                        m.Timestamp,
+                        IsRead = m.IsDelivered // or however you track read status
+            })
+                    .OrderBy(m => m.Timestamp) // Ensure messages are ordered by timestamp
+                    .ToList();
+
+                return Ok(messages);
             }
         }
     }

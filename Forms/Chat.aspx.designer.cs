@@ -33,6 +33,24 @@ namespace RealTimeChatHub.Forms
         protected global::System.Web.UI.WebControls.Button btnLogout;
 
         /// <summary>
+        /// roomSelect control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList roomSelect;
+
+        /// <summary>
+        /// newRoomName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox newRoomName;
+
+        /// <summary>
         /// userSelect control.
         /// </summary>
         /// <remarks>
@@ -49,6 +67,15 @@ namespace RealTimeChatHub.Forms
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField hiddenSenderId;
+
+        /// <summary>
+        /// messageContainer control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl messageContainer;
 
         /// <summary>
         /// txtMessage control.
