@@ -43,7 +43,7 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifacts'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'  # Update this to match your output directory
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
 
@@ -51,7 +51,7 @@ steps:
 - task: AzureWebApp@1
   displayName: 'Deploy to Azure Web App'
   inputs:
-    azureSubscription: 'Shameema2325'  # Replace with your actual Azure service connection name
-    appName: 'RealTimeChatHub'  # Replace with your actual Azure Web App name
+    azureSubscription: 'AzureRM_Connection'  
+    appName: 'RealTimeChatHub'  
+    appType: 'webApp'  
     package: '$(Build.ArtifactStagingDirectory)/**/*.zip'  # Path to the package to deploy
-    appType: 'webApp'  # Specify the type of app, e.g., 'webApp' for a standard web application
