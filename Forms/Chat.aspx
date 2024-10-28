@@ -4,8 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="/Forms/Scripts/jquery-1.12.4.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="/Scripts/jquery.signalR-2.4.2.min.js"></script>
     <script src="/signalr/hubs"></script>
     <title>ChatBot</title>
     <style>
@@ -38,6 +38,7 @@
         }
     </style>
 </head>
+
 <body>
     <form id="form1" runat="server">
         <div class="container-fluid vh-100 d-flex flex-column">
@@ -85,18 +86,25 @@
             var chatHub;
 
             function initializeSignalR() {
-                chatHub = $.hubConnection("http://localhost:51843/signalr");
+                chatHub = $.hubConnection("/signalr");
                 var chatProxy = chatHub.createHubProxy("chatHub");
 
-                // Set up the message receiving function
-                chatProxy.on("ReceiveMessage", function (user, message, senderId) {
-                    appendMessage(user, message, senderId);
+                // Handle incoming messages
+                chatProxy.on("receiveMessage", function (userId, message, timestamp) {
+                    const msg = `<div class="chat-message"><strong>${userId}</strong>: ${message} <small>${new Date(timestamp).toLocaleString()}</small></div>`;
+                    $("#messageContainer").append(msg);
+                    $("#messageContainer").scrollTop($("#messageContainer")[0].scrollHeight); // Scroll to the bottom
                 });
 
-                // Start the SignalR connection
-                chatHub.start().then(function () {
+                // Handle errors
+                chatProxy.on("receiveError", function (errorMessage) {
+                    alert(errorMessage); // Display the error message to the user
+                });
+
+                // Start the SignalR connection with .done() and .fail() for compatibility
+                chatHub.start().done(function () {
                     console.log("Connected to the chat hub!");
-                }).catch(function (err) {
+                }).fail(function (err) {
                     console.log("Not connected to the chat hub!");
                     console.error(err.toString());
                 });
