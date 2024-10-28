@@ -1,0 +1,57 @@
+# azure-pipelines.yml
+# This pipeline builds and deploys the RealTimeChatHub project.
+
+trigger:
+- master  # Trigger the pipeline on pushes to the master branch
+
+pool:
+  vmImage: 'windows-latest'  # Use the latest Windows image
+
+variables:
+  solution: '**/*.sln'  # Path to the solution file
+  buildPlatform: 'Any CPU'  # Platform for the build
+  buildConfiguration: 'Release'  # Build configuration
+
+steps:
+# Step 1: Install NuGet
+- task: NuGetToolInstaller@1
+  displayName: 'Install NuGet'
+
+# Step 2: Restore NuGet packages
+- task: NuGetCommand@2
+  displayName: 'Restore NuGet packages'
+  inputs:
+    command: 'restore'
+    restoreSolution: '$(solution)'
+
+# Step 3: Build the solution
+- task: VSBuild@1
+  displayName: 'Build solution'
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+# Step 4: Run unit tests
+- task: VSTest@2
+  displayName: 'Run unit tests'
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+# Step 5: Publish build artifacts
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'  # Update this to match your output directory
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+
+# Step 6: Deploy to Azure
+- task: AzureWebApp@1
+  displayName: 'Deploy to Azure Web App'
+  inputs:
+    azureSubscription: 'Shameema2325'  # Replace with your actual Azure service connection name
+    appName: 'RealTimeChatHub'  # Replace with your actual Azure Web App name
+    package: '$(Build.ArtifactStagingDirectory)/**/*.zip'  # Path to the package to deploy
+    appType: 'webApp'  # Specify the type of app, e.g., 'webApp' for a standard web application
