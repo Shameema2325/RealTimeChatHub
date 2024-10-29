@@ -8,7 +8,6 @@ using System.Web.Routing;
 using Hangfire;
 using Microsoft.Owin;
 using Owin;
-using RealTimeChatHub.Hubs;
 
 [assembly: OwinStartup(typeof(RealTimeChatHub.Startup))]
 

@@ -30,7 +30,8 @@ namespace RealTimeChatHub.Controllers
             var newUser = new User
             {
                 UserName = registerRequest.UserName,
-                PasswordHash = hashedPassword
+                PasswordHash = hashedPassword,
+                Email= registerRequest.Email
             };
 
             _context.Users.Add(newUser);
@@ -51,7 +52,7 @@ namespace RealTimeChatHub.Controllers
                 return Unauthorized(); // Invalid username or password
             }
 
-            // Generate and return a token if the login is successful (simplified token for example)
+            // Generate and return a token if the login is successful
             string token = GenerateToken(user);            
             return Ok(new { UserId = user.UserId, Token = token });
         }
@@ -70,7 +71,6 @@ namespace RealTimeChatHub.Controllers
 
         private string GenerateToken(User user)
         {
-            // Implement a token generation strategy here (e.g., JWT)
             return Convert.ToBase64String(Guid.NewGuid().ToByteArray()); // Simple token example
         }
 
@@ -86,6 +86,8 @@ namespace RealTimeChatHub.Controllers
         {
             public string UserName { get; set; }
             public string Password { get; set; }
+
+            public string Email { get; set; }
         }
     }
 }

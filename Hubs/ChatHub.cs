@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.SignalR;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace RealTimeChatHub.Hubs
 {
@@ -19,18 +20,16 @@ namespace RealTimeChatHub.Hubs
             // Log the action for debugging
             Console.WriteLine($"Sending message from User {senderId} to User {receiverId}: {messageText}");
 
-            // Attempt to deliver message to the specified user
-            Clients.User(receiverId.ToString()).receiveMessage(senderId.ToString(), messageText, DateTime.UtcNow);
+            // Deliver message to the specific user
+            Clients.User(receiverId.ToString()).receiveMessage(senderId.ToString(), messageText, DateTime.UtcNow, false);
         }
 
         // Handle user connection
         public override Task OnConnected()
         {
-            var userId = Context.User.Identity.Name; // Assumes user ID is stored in the user's identity
-
+            var userId = Context.QueryString["userId"];
             if (!string.IsNullOrEmpty(userId))
             {
-                // Add the connection to a group named by the user ID for easy targeting
                 Groups.Add(Context.ConnectionId, userId);
                 Console.WriteLine($"User {userId} connected with Connection ID: {Context.ConnectionId}");
             }
@@ -45,33 +44,14 @@ namespace RealTimeChatHub.Hubs
         // Handle user disconnection
         public override Task OnDisconnected(bool stopCalled)
         {
-            var userId = Context.User.Identity.Name;
-
+            var userId = Context.QueryString["userId"];
             if (!string.IsNullOrEmpty(userId))
             {
                 Groups.Remove(Context.ConnectionId, userId);
                 Console.WriteLine($"User {userId} disconnected with Connection ID: {Context.ConnectionId}");
             }
-            else
-            {
-                Console.WriteLine("Unable to identify the disconnecting user.");
-            }
 
             return base.OnDisconnected(stopCalled);
-        }
-
-        // Broadcast a message to all users in the chat
-        public void BroadcastMessage(string userName, string message)
-        {
-            if (!string.IsNullOrWhiteSpace(userName) && !string.IsNullOrWhiteSpace(message))
-            {
-                Console.WriteLine($"Broadcasting message from {userName}: {message}");
-                Clients.All.receiveMessage(userName, message, DateTime.UtcNow);
-            }
-            else
-            {
-                Clients.Caller.receiveError("Invalid broadcast message.");
-            }
         }
     }
 }

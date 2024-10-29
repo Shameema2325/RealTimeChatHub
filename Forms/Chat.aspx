@@ -98,97 +98,94 @@
         </div>
     </form>
 
-   <script>
-       $(function () {
-           var chatHub;
+    <script>
+        $(function () {
+            var chatHub;
 
-           function initializeSignalR() {
-               chatHub = $.hubConnection("/signalr");
-               var chatProxy = chatHub.createHubProxy("chatHub");
+            function initializeSignalR() {
+                var userId = $('#hiddenSenderId').val(); // Ensure userId is available
+                chatHub = $.hubConnection("/signalr", { qs: { userId: userId } });
+                var chatProxy = chatHub.createHubProxy("chatHub");
 
-               chatProxy.on("receiveMessage", function (userId, message, timestamp, isRead) {
-                   appendMessage(userId, message, userId, isRead); // Adjusted function call
-               });
+                chatProxy.on("receiveMessage", function (userId, message, timestamp, isRead) {
+                    appendMessage(userId, message, userId, isRead);
+                });
 
-               chatHub.start().done(function () {
-                   console.log("Connected to the chat hub!");
-               }).fail(function (err) {
-                   console.error(err.toString());
-               });
-           }
+                chatHub.start().done(function () {
+                    console.log("Connected to the chat hub!");
+                }).fail(function (err) {
+                    console.error("Connection failed: " + err.toString());
+                });
+            }
 
-           function appendMessage(user, message, senderId, isRead) {
-               const msgClass = senderId === $('#hiddenSenderId').val() ? 'message-sent' : 'message-received'; // Class based on sender ID
-               const readReceipt = isRead ? ' - Read' : ''; // Optionally show read receipt
-               const msg = `<div class="chat-message ${msgClass}"><strong>${user}</strong>: ${message}${readReceipt}</div>`;
-               $("#messageContainer").append(msg);
-               $("#messageContainer").scrollTop($("#messageContainer")[0].scrollHeight); // Scroll to the bottom
-           }
+            function appendMessage(user, message, senderId, isRead) {
+                const msgClass = senderId === $('#hiddenSenderId').val() ? 'message-sent' : 'message-received';
+                const readReceipt = isRead ? ' - Read' : '';
+                const msg = `<div class="chat-message ${msgClass}"><strong>${user}</strong>: ${message}${readReceipt}</div>`;
+                $("#messageContainer").append(msg);
+                $("#messageContainer").scrollTop($("#messageContainer")[0].scrollHeight);
+            }
 
-           function loadMessageHistory() {
-               var selectedUserId = $('#userSelect').val();
-               $.ajax({
-                   url: `/api/messages/history?senderId=${$('#hiddenSenderId').val()}&receiverId=${selectedUserId}`,
-                   method: "GET",
-                   success: function (data) {
-                       $("#messageContainer").empty(); // Clear existing messages
-                       data.forEach(message => {
-                           // Determine who sent the message
-                           const isSentByUser = message.SenderId === $('#hiddenSenderId').val(); // Check if the logged-in user sent the message
+            function loadMessageHistory() {
+                var selectedUserId = $('#userSelect').val();
+                $.ajax({
+                    url: `/api/messages/history?senderId=${$('#hiddenSenderId').val()}&receiverId=${selectedUserId}`,
+                    method: "GET",
+                    success: function (data) {
+                        $("#messageContainer").empty();
+                        data.forEach(message => {
+                            const isSentByUser = message.SenderId === $('#hiddenSenderId').val();
+                            if (isSentByUser) {
+                                appendMessage("You", message.MessageText, message.SenderId, message.IsRead);
+                            } else {
+                                appendMessage(message.SenderId, message.MessageText, message.SenderId, message.IsRead);
+                            }
+                        });
+                    },
+                    error: function () {
+                        alert('Failed to load message history.');
+                    }
+                });
+            }
 
-                           if (isSentByUser) {
-                               // Message sent by the logged-in user
-                               appendMessage("You", message.MessageText, message.SenderId, message.IsRead); // Right aligned
-                           } else {
-                               // Message received by the logged-in user
-                               appendMessage(message.SenderId, message.MessageText, message.SenderId, message.IsRead); // Left aligned
-                           }
-                       });
-                   },
-                   error: function () {
-                       alert('Failed to load message history.');
-                   }
-               });
-           }
+            $('#userSelect').change(function () {
+                loadMessageHistory();
+            });
 
+            function sendMessage() {
+                var selectedUserId = $('#userSelect').val();
+                var messageText = $('#txtMessage').val().trim();
+                if (selectedUserId && messageText) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/messages/send",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            SenderId: $('#hiddenSenderId').val(),
+                            ReceiverId: selectedUserId,
+                            MessageText: messageText
+                        }),
+                        success: function () {
+                            appendMessage("You", messageText, $('#hiddenSenderId').val(), true);
+                            $('#txtMessage').val('');
+                        },
+                        error: function () {
+                            alert('Failed to send message. Please try again.');
+                        }
+                    });
+                } else {
+                    alert('Please select a user and enter a message.');
+                }
+            }
 
-           $('#userSelect').change(function () {
-               loadMessageHistory();
-           });
+            $('#btnSend').click(function () {
+                sendMessage();
+            });
 
-           function sendMessage() {
-               var selectedUserId = $('#userSelect').val();
-               var messageText = $('#txtMessage').val().trim();
-               if (selectedUserId && messageText) {
-                   $.ajax({
-                       type: "POST",
-                       url: "/api/messages/send",
-                       contentType: "application/json",
-                       data: JSON.stringify({
-                           SenderId: $('#hiddenSenderId').val(),
-                           ReceiverId: selectedUserId,
-                           MessageText: messageText
-                       }),
-                       success: function () {
-                           appendMessage("You", messageText, $('#hiddenSenderId').val(), true);
-                           $('#txtMessage').val('');
-                       },
-                       error: function () {
-                           alert('Failed to send message. Please try again.');
-                       }
-                   });
-               } else {
-                   alert('Please select a user and enter a message.');
-               }
-           }
+            initializeSignalR();
+        });
+    </script>
 
-           $('#btnSend').click(function () {
-               sendMessage();
-           });
-
-           initializeSignalR();
-       });
-   </script>
 
 </body>
 </html>
