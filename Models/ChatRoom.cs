@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
 
 public class ChatRoom
 {
-    [Key]
-    public int RoomId { get; set; }
-    public string RoomName { get; set; }
+    public int Id { get; set; } // Unique identifier for the chat room
+    public string RoomName { get; set; } // Name of the chat room
+    public DateTime CreatedAt { get; set; } // Timestamp for when the room was created
+    public int CreatedBy { get; set; } // ID of the user who created the room
 }

@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
+using Newtonsoft.Json;
+using RealTimeChatHub.Controllers;
 using RealTimeChatHub.Models;
 
 namespace RealTimeChatHub.Forms
@@ -148,10 +153,68 @@ namespace RealTimeChatHub.Forms
             }
         }
 
-
         protected void RoomChanged(object sender, EventArgs e)
         {
-            // Handle room selection changes here
+            // Logic to handle when a room is selected from the dropdown
+            if (!string.IsNullOrEmpty(roomSelect.SelectedValue))
+            {
+                int selectedRoomId = int.Parse(roomSelect.SelectedValue);
+            }
+        }
+
+        protected void btnCreateRoom_Click(object sender, EventArgs e)
+        {
+            string roomName = roomNameTextBox.Text.Trim();
+
+            if (!string.IsNullOrEmpty(roomName))
+            {
+                using (var dbContext = new ChatAppDBContext())
+                {
+                    // Get the ID of the user who is creating the room from the session
+                    int createdById = int.Parse(hiddenSenderId.Value); // Assuming hiddenSenderId holds the user ID
+
+                    // Create a new chat room instance
+                    var chatRoom = new ChatRoom
+                    {
+                        RoomName = roomName,
+                        CreatedAt = DateTime.Now, // Set the current date and time
+                        CreatedBy = createdById // Set the creator's user ID
+                    };
+
+                    // Add the chat room to the database and save changes
+                    dbContext.ChatRooms.Add(chatRoom);
+                    dbContext.SaveChanges();
+                }
+
+                LoadChatRooms(); // Refresh the room list after creation
+                roomNameTextBox.Text = ""; // Clear the text box
+            }
+            else
+            {
+                // Handle empty room name scenario
+                Console.WriteLine("Room name cannot be empty.");
+            }
+        }
+
+        private void LoadChatRooms()
+        {
+            try
+            {
+                using (var dbContext = new ChatAppDBContext())
+                {
+                    var chatRooms = dbContext.ChatRooms.Select(r => new { r.Id, r.RoomName }).ToList();
+                    roomSelect.DataSource = chatRooms;
+                    roomSelect.DataTextField = "RoomName";
+                    roomSelect.DataValueField = "Id";
+                    roomSelect.DataBind();
+                    roomSelect.Items.Insert(0, new ListItem("Select Room", ""));
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the error and redirect to an error page
+                Console.WriteLine("An error occurred: " + ex.Message);
+            }
         }
     }
 }

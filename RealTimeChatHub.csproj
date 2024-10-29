@@ -229,6 +229,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AuthController.cs" />
     <Compile Include="Controllers\MessageController.cs" />
+    <Compile Include="Controllers\RoomController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Forms\Chat.aspx.cs">
       <DependentUpon>Chat.aspx</DependentUpon>
@@ -259,8 +260,13 @@
     <Compile Include="Migrations\202410252104259_InitialCreate.designer.cs">
       <DependentUpon>202410252104259_InitialCreate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202410290847091_UpdateSchema.cs" />
+    <Compile Include="Migrations\202410290847091_UpdateSchema.designer.cs">
+      <DependentUpon>202410290847091_UpdateSchema.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ChatAppDBContext.cs" />
+    <Compile Include="Models\ChatRoom.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -354,6 +360,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202410252104259_InitialCreate.resx">
       <DependentUpon>202410252104259_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202410290847091_UpdateSchema.resx">
+      <DependentUpon>202410290847091_UpdateSchema.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

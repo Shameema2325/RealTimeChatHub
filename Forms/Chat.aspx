@@ -58,15 +58,17 @@
                 </div>
             </div>
 
-            <!-- Room Selection -->
+            <!-- Existing Rooms Dropdown and Room Creation -->
             <div class="row p-3">
                 <div class="col-12">
-                    <asp:DropDownList ID="roomSelect" CssClass="form-control" runat="server" AutoPostBack="true" OnSelectedIndexChanged="RoomChanged">
-                        <asp:ListItem Text="Create New Room" Value="new"></asp:ListItem>
+                    <asp:DropDownList ID="roomSelect" runat="server" AutoPostBack="true" OnSelectedIndexChanged="RoomChanged" CssClass="form-control">
+                        <asp:ListItem Text="Select Room" Value="" />
                     </asp:DropDownList>
-                    <asp:TextBox ID="newRoomName" runat="server" CssClass="form-control mt-2" Placeholder="Enter new room name..." Visible="false"></asp:TextBox>
+                    <asp:TextBox ID="roomNameTextBox" runat="server" CssClass="form-control mt-2" Placeholder="Enter new chat room name..." />
+                    <asp:Button ID="btnCreateRoom" runat="server" Text="Create Room" CssClass="btn btn-primary mt-2" OnClick="btnCreateRoom_Click" />
                 </div>
             </div>
+
 
             <!-- User Selection -->
             <div class="row p-3">
@@ -126,6 +128,45 @@
                 $("#messageContainer").scrollTop($("#messageContainer")[0].scrollHeight);
             }
 
+            $('#btnCreateRoom').click(function () {
+                var roomName = $('#roomNameTextBox').val().trim();
+                if (roomName) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/rooms/create", // Adjust the API endpoint accordingly
+                        contentType: "application/json",
+                        data: JSON.stringify({ RoomName: roomName }),
+                        success: function () {
+                            $('#roomNameTextBox').val(''); // Clear the text box
+                            loadChatRooms(); // Refresh room list after creation
+                        },
+                        error: function () {
+                            alert('Failed to create chat room. Please try again.');
+                        }
+                    });
+                } else {
+                    alert('Please enter a room name.');
+                }
+            });
+
+            function loadChatRooms() {
+                $.ajax({
+                    url: "/api/rooms/list",
+                    method: "GET",
+                    success: function (data) {
+                        $("#roomSelect").empty(); // Clear existing options
+                        $("#roomSelect").append('<option value="">Select Room</option>'); 
+                        data.forEach(function (room) {
+                            $("#roomSelect").append(`<option value="${room.Id}">${room.RoomName}</option>`);
+                        });
+                    },
+                    error: function () {
+                        alert('Failed to load chat rooms.');
+                    }
+                });
+            }
+
+
             function loadMessageHistory() {
                 var selectedUserId = $('#userSelect').val();
                 $.ajax({
@@ -182,7 +223,10 @@
                 sendMessage();
             });
 
-            initializeSignalR();
+            $(document).ready(function () {
+                loadChatRooms(); // Load chat rooms when the page is ready
+                initializeSignalR();
+            });
         });
     </script>
 
