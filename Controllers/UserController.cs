@@ -51,13 +51,6 @@ namespace RealTimeChatHub.Controllers
             return Ok(new { user.UserId});
         }
 
-        [HttpGet]
-        public IHttpActionResult GetUsers()
-        {
-            var users = _context.Users.Select(u => new { u.UserId, u.UserName }).ToList();
-            return Ok(users);
-        }        
-
         private bool VerifyPassword(string password, string storedHash)
         {
             return HashPassword(password) == storedHash;

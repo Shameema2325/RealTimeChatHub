@@ -20,13 +20,13 @@ namespace RealTimeChatHub.Forms
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri("http://localhost:51843/");
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                // Serialize login data and send POST request
+                // Serialize login data
                 var content = new StringContent(JsonConvert.SerializeObject(loginData), System.Text.Encoding.UTF8, "application/json");
 
                 try
                 {
+                    //Send POST request
                     HttpResponseMessage response = await client.PostAsync("api/user/login", content);
 
                     if (response.IsSuccessStatusCode)

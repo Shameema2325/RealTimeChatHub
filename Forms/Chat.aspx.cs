@@ -98,7 +98,7 @@ namespace RealTimeChatHub.Forms
                         .OrderBy(m => m.Timestamp) 
                         .Select(m => new
                         {
-                            UserName = m.Sender.UserName,
+                            m.Sender.UserName,
                             m.MessageText,
                             m.Timestamp,
                             IsRead = m.IsDelivered
@@ -125,7 +125,6 @@ namespace RealTimeChatHub.Forms
             {
                 // Log the error and redirect to an error page
                 Console.WriteLine("An error occurred: " + ex.Message);
-                Response.Redirect("~/Forms/Error.aspx");
             }
         }
 
