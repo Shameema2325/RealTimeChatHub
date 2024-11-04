@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Chat.aspx.cs" Inherits="RealTimeChatHub.Forms.Chat" enableSessionState="true" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Chat.aspx.cs" Inherits="RealTimeChatHub.Forms.Chat" EnableSessionState="true" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -9,33 +9,43 @@
     <script src="/signalr/hubs"></script>
     <title>ChatBot</title>
     <style>
-        .read {
-            font-weight: normal; /* Optional styling for read messages */
-        }
-
-        .unread {
-            font-weight: bold; /* Optional styling for unread messages */
-        }
-
-        .chat-message {
-            clear: both;
-            margin: 5px;
+        /* General message styling */
+        .message {
+            display: block;
+            max-width: 60%;
+            margin: 10px 0;
             padding: 10px;
-            border-radius: 5px;
-            max-width: 70%; /* Limit the width of the messages */
+            border-radius: 10px;
+            position: relative;
+            font-size: 14px;
         }
 
-        .message-sent {
-            background-color: #dcf8c6; /* Light green for sent messages */
-            float: right; /* Align to the right */
-            text-align: right; /* Text alignment */
+        /* Styling for sender messages (right-aligned) */
+        .sender {
+            align-self: flex-end;
+            background-color: #d1e7dd; /* Light green for sender */
+            text-align: right;
+            float: right;
+            clear: both;
         }
 
-        .message-received {
-            background-color: #ffffff; /* White for received messages */
-            float: left; /* Align to the left */
-            text-align: left; /* Text alignment */
+        /* Styling for receiver messages (left-aligned) */
+        .receiver {
+            align-self: flex-start;
+            background-color: #f8d7da; /* Light red for receiver */
+            text-align: left;
+            float: left;
+            clear: both;
         }
+
+        /* Styling for read/unread indicators */
+        .read {
+            opacity: 0.6;
+        }
+        .unread {
+            font-weight: bold;
+        }        
+
         /* Clearfix to prevent container collapse */
         .clearfix::after {
             content: "";
@@ -121,9 +131,8 @@
             }
 
             function appendMessage(user, message, senderId, isRead) {
-                const msgClass = senderId === $('#hiddenSenderId').val() ? 'message-sent' : 'message-received';
-                const readReceipt = isRead ? ' - Read' : '';
-                const msg = `<div class="chat-message ${msgClass}"><strong>${user}</strong>: ${message}${readReceipt}</div>`;
+                const msgClass = senderId === $('#hiddenSenderId').val() ? 'sender' : 'receiver';
+                const msg = `<div class="sender ${msgClass}"><strong>${user}</strong>: ${message}${readReceipt}</div>`;
                 $("#messageContainer").append(msg);
                 $("#messageContainer").scrollTop($("#messageContainer")[0].scrollHeight);
             }

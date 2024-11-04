@@ -38,6 +38,7 @@ namespace RealTimeChatHub.Controllers
 
             // Send message using SignalR
             var hubContext = GlobalHost.ConnectionManager.GetHubContext<ChatHub>();
+            Console.Write("Hi");
             var receiverClient = hubContext.Clients.User(messageDto.ReceiverId.ToString());
 
             if (receiverClient != null)

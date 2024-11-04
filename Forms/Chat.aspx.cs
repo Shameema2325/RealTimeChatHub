@@ -95,13 +95,14 @@ namespace RealTimeChatHub.Forms
                     var messages = dbContext.Messages
                         .Where(m => (m.SenderId == loggedInUserId && m.ReceiverId == selectedUserId) ||
                                     (m.SenderId == selectedUserId && m.ReceiverId == loggedInUserId))
-                        .OrderBy(m => m.Timestamp) 
+                        .OrderBy(m => m.Timestamp)
                         .Select(m => new
                         {
                             m.Sender.UserName,
                             m.MessageText,
                             m.Timestamp,
-                            IsRead = m.IsDelivered
+                            IsRead = m.IsDelivered,
+                            IsSender = m.SenderId == loggedInUserId // Check if the message is from the logged-in user
                         })
                         .ToList();
 
@@ -115,11 +116,17 @@ namespace RealTimeChatHub.Forms
                         var messageLabel = new Label
                         {
                             Text = $"{message.UserName}: {message.MessageText} <br/>",
-                            CssClass = message.IsRead ? "message read" : "message unread" 
+                            CssClass = message.IsRead ? "message read" : "message unread"
                         };
+
+                        // Apply alignment class based on whether the message is from the logged-in user
+                        messageLabel.CssClass += message.IsSender ? " sender" : " receiver";
+
+                        // Add the message label to the container
                         messageContainer.Controls.Add(messageLabel);
                     }
                 }
+
             }
             catch (Exception ex)
             {
