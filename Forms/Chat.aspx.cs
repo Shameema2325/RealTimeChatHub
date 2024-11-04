@@ -129,24 +129,6 @@ namespace RealTimeChatHub.Forms
             }
         }
 
-        public void AppendMessage(string userId, string message, bool isRead)
-        {
-            var messageContainer = (HtmlGenericControl)FindControl("messageContainer");
-            if (messageContainer != null)
-            {
-                // Construct the message HTML
-                string msgClass = (Session["UserId"].ToString() == userId) ? "message-sent" : "message-received";
-                string readReceipt = isRead ? " - Read" : "";
-                string msg = $"<div class='chat-message {msgClass}'><strong>{userId}</strong>: {message}{readReceipt}</div>";
-
-                // Append message to the message container
-                messageContainer.InnerHtml += msg;
-
-                // Clearfix div to ensure layout integrity
-                messageContainer.InnerHtml += "<div class='clearfix'></div>";
-            }
-        }
-
         protected void RoomChanged(object sender, EventArgs e)
         {
             // Logic to handle when a room is selected from the dropdown
