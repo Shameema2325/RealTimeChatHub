@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using Newtonsoft.Json;
-using RealTimeChatHub.Controllers;
 using RealTimeChatHub.Models;
 
 namespace RealTimeChatHub.Forms
@@ -16,14 +11,15 @@ namespace RealTimeChatHub.Forms
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            
             if (!IsPostBack) // Ensure this only runs on the first load
             {
-                string userIdQuery = Request.QueryString["UserId"];
+                var user_id = Application["UserId"].ToString();
 
                 // Validate UserId in Query String or Session, then store in hidden field
-                if (!string.IsNullOrEmpty(userIdQuery) && int.TryParse(userIdQuery, out int userId))
+                if (!string.IsNullOrEmpty(user_id) && int.TryParse(user_id, out int userId))
                 {
-                    hiddenSenderId.Value = userIdQuery;
+                    hiddenSenderId.Value = user_id;
                     LoadUserOptions(userId);
                 }
                 else
@@ -43,8 +39,7 @@ namespace RealTimeChatHub.Forms
 
         protected void UserSelectChanged(object sender, EventArgs e)
         {
-            int selectedUserId;
-            if (int.TryParse(userSelect.SelectedValue, out selectedUserId))
+            if (int.TryParse(userSelect.SelectedValue, out int selectedUserId))
             {
                 LoadMessagesForUser(selectedUserId);
             }
@@ -85,7 +80,6 @@ namespace RealTimeChatHub.Forms
             {
                 // Log the error and redirect to an error page
                 Console.WriteLine("An error occurred: " + ex.Message);
-                Response.Redirect("~/Forms/Error.aspx");
             }
         }
 
@@ -101,7 +95,7 @@ namespace RealTimeChatHub.Forms
                     var messages = dbContext.Messages
                         .Where(m => (m.SenderId == loggedInUserId && m.ReceiverId == selectedUserId) ||
                                     (m.SenderId == selectedUserId && m.ReceiverId == loggedInUserId))
-                        .OrderBy(m => m.Timestamp) // Ensure messages are ordered by timestamp
+                        .OrderBy(m => m.Timestamp) 
                         .Select(m => new
                         {
                             UserName = m.Sender.UserName,
@@ -121,7 +115,7 @@ namespace RealTimeChatHub.Forms
                         var messageLabel = new Label
                         {
                             Text = $"{message.UserName}: {message.MessageText} <br/>",
-                            CssClass = message.IsRead ? "message read" : "message unread" // Optional: apply different styles based on read status
+                            CssClass = message.IsRead ? "message read" : "message unread" 
                         };
                         messageContainer.Controls.Add(messageLabel);
                     }

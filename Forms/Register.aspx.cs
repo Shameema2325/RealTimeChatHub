@@ -12,18 +12,12 @@ namespace RealTimeChatHub.Forms
 {
     public partial class Register : Page
     {
-        protected void Page_Load(object sender, EventArgs e)
-        {
-
-        }
+        protected void Page_Load(object sender, EventArgs e) { } 
 
         protected async void BtnRegister_Click(object sender, EventArgs e)
         {
-            string userName = txtUsername.Text;
-            string password = txtPassword.Text;
-
             // Create the registration data
-            var registerData = new { UserName = userName, Password = password };
+            var registerData = new { UserName = txtUsername.Text, Password = txtPassword.Text, Email = txtEmail.Text };
 
             using (HttpClient client = new HttpClient())
             {
@@ -38,7 +32,6 @@ namespace RealTimeChatHub.Forms
 
                     if (response.IsSuccessStatusCode)
                     {
-                        lblMessage.Text = "Registration successful! Please log in.";
                         Response.Redirect("Login.aspx"); // Redirect to login page if registration is successful
                     }
                     else

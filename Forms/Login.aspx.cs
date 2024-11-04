@@ -1,12 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace RealTimeChatHub.Forms
 {   
@@ -18,11 +14,8 @@ namespace RealTimeChatHub.Forms
         }
         protected async void BtnLogin_Click(object sender, EventArgs e)
         {
-            string userName = txtUsername.Text;
-            string password = txtPassword.Text;
-
             // Prepare login data
-            var loginData = new { UserName = userName, Password = password };
+            var loginData = new { UserName = txtUsername.Text, Password = txtPassword.Text };
 
             using (HttpClient client = new HttpClient())
             {
@@ -41,9 +34,9 @@ namespace RealTimeChatHub.Forms
                         var responseData = await response.Content.ReadAsStringAsync();
                         var result = JsonConvert.DeserializeObject<LoginResponse>(responseData);
 
-                        // Store token in session for future use
-                        Session["AuthToken"] = result.Token;
-                        Response.Redirect("Chat.aspx?UserId=" + result.UserId + ""); // Redirect to main chat page
+                        Application["UserId"] = result.UserId; // Set User Id
+
+                        Response.Redirect("Chat.aspx"); // Redirect to main chat page
                     }
                     else
                     {

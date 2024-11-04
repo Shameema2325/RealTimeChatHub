@@ -1,12 +1,8 @@
 ﻿using RealTimeChatHub.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
-using System.Web;
 using System.Web.Http;
 
 namespace RealTimeChatHub.Controllers
@@ -50,11 +46,9 @@ namespace RealTimeChatHub.Controllers
             if (user == null || !VerifyPassword(loginRequest.Password, user.PasswordHash))
             {
                 return Unauthorized(); // Invalid username or password
-            }
+            }      
 
-            // Generate and return a token if the login is successful
-            string token = GenerateToken(user);            
-            return Ok(new { UserId = user.UserId, Token = token });
+            return Ok(new { user.UserId});
         }
 
         [HttpGet]
@@ -69,11 +63,6 @@ namespace RealTimeChatHub.Controllers
             return HashPassword(password) == storedHash;
         }
 
-        private string GenerateToken(User user)
-        {
-            return Convert.ToBase64String(Guid.NewGuid().ToByteArray()); // Simple token example
-        }
-
         private string HashPassword(string password)
         {
             using (var sha256 = SHA256.Create())
@@ -86,7 +75,6 @@ namespace RealTimeChatHub.Controllers
         {
             public string UserName { get; set; }
             public string Password { get; set; }
-
             public string Email { get; set; }
         }
 

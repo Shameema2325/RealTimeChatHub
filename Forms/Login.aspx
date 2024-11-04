@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="RealTimeChatHub.Forms.Login" Async="true" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="RealTimeChatHub.Forms.Login" enableSessionState="true" Async="true" %>
 
 <!DOCTYPE html>
 

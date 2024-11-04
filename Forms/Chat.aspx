@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Chat.aspx.cs" Inherits="RealTimeChatHub.Forms.Chat" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Chat.aspx.cs" Inherits="RealTimeChatHub.Forms.Chat" enableSessionState="true" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -165,33 +165,6 @@
                     }
                 });
             }
-
-
-            function loadMessageHistory() {
-                var selectedUserId = $('#userSelect').val();
-                $.ajax({
-                    url: `/api/messages/history?senderId=${$('#hiddenSenderId').val()}&receiverId=${selectedUserId}`,
-                    method: "GET",
-                    success: function (data) {
-                        $("#messageContainer").empty();
-                        data.forEach(message => {
-                            const isSentByUser = message.SenderId === $('#hiddenSenderId').val();
-                            if (isSentByUser) {
-                                appendMessage("You", message.MessageText, message.SenderId, message.IsRead);
-                            } else {
-                                appendMessage(message.SenderId, message.MessageText, message.SenderId, message.IsRead);
-                            }
-                        });
-                    },
-                    error: function () {
-                        alert('Failed to load message history.');
-                    }
-                });
-            }
-
-            $('#userSelect').change(function () {
-                loadMessageHistory();
-            });
 
             function sendMessage() {
                 var selectedUserId = $('#userSelect').val();
