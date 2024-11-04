@@ -115,24 +115,28 @@
             var chatHub;
 
             function initializeSignalR() {
-                var userId = $('#hiddenSenderId').val(); // Ensure userId is available
-                chatHub = $.hubConnection("/signalr", { qs: { userId: userId } });
+                var userId = $('#hiddenSenderId').val();
+                chatHub = $.hubConnection();
                 var chatProxy = chatHub.createHubProxy("chatHub");
 
-                chatProxy.on("receiveMessage", function (userId, message, timestamp, isRead) {
-                    appendMessage(userId, message, userId, isRead);
+                // Listen for incoming messages
+                chatProxy.on("receiveMessage", function (senderId, message, timestamp, isRead) {
+                    appendMessage(senderId, message, senderId, isRead);
                 });
 
-                chatHub.start().done(function () {
-                    console.log("Connected to the chat hub!");
-                }).fail(function (err) {
-                    console.error("Connection failed: " + err.toString());
-                });
+                chatHub.start()
+                    .done(function () {
+                        console.log("Connected to the chat hub!");
+                    })
+                    .fail(function (err) {
+                        console.error("Connection failed: " + err.toString());
+                    });
             }
 
             function appendMessage(user, message, senderId, isRead) {
                 const msgClass = senderId === $('#hiddenSenderId').val() ? 'sender' : 'receiver';
-                const msg = `<div class="sender ${msgClass}"><strong>${user}</strong>: ${message}${readReceipt}</div>`;
+                const readReceipt = isRead ? `<span class="badge badge-secondary">Read</span>` : '';
+                const msg = `<div class="message ${msgClass} clearfix"><strong>${user}</strong>: ${message} ${readReceipt}</div>`;
                 $("#messageContainer").append(msg);
                 $("#messageContainer").scrollTop($("#messageContainer")[0].scrollHeight);
             }
@@ -201,8 +205,8 @@
                 }
             }
 
-            $('#btnSend').click(function () {
-                sendMessage();
+           $('#btnSend').click(function () {
+            sendMessage();
             });
 
             $(document).ready(function () {
